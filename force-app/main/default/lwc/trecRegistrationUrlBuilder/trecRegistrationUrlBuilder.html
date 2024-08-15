@@ -47,60 +47,90 @@
 
         <!-- FILTER PANEL -->
         <div lwc:if={showFilterPanel} class="filter-panel slds-var-m-around_small">
-            <lightning-layout>
-                <lightning-layout-item flexibility="auto" padding="around-small">
-                    <lightning-combobox
-                        name="Location"
-                        label="Location"
-                        value={filteredLocation}
-                        placeholder="All Locations"
-                        options={locationOptions}
-                        onchange={handleLocationChange}
-                        disabled={locationIsDisabled}
-                    ></lightning-combobox>
-                    <lightning-combobox
-                        name="session"
-                        label="Session"
-                        value={filteredSession}
-                        placeholder="All Sessions"
-                        options={sessionOptions}
-                        onchange={handleSessionChange}
-                        disabled={sessionIsDisabled}
-                    ></lightning-combobox>
-                    <lightning-input 
-                        type="date" 
-                        name="Start Date" 
-                        label="Start Date" 
-                        value={filteredStartDate}
-                        onchange={handleStartDateChange}
-                    ></lightning-input>
-                    <lightning-input 
-                        type="date" 
-                        name="End Date" 
-                        label="End Date" 
-                        value={filteredEndDate}
-                        onchange={handleEndDateChange}
-                    ></lightning-input>
-                </lightning-layout-item>
 
-                <lightning-layout-item flexibility="auto" padding="around-small">
-                    <lightning-input 
-                        type="number" 
-                        name="age" 
-                        value={filteredAge} 
-                        onchange={handleAgeChange} 
-                        label="Age"
-                    ></lightning-input>
-                    <lightning-checkbox-group 
-                        name="dayOfWeek"
-                        label="Days of Week"
-                        options={daysOfWeek}
-                        value={filteredDays}
-                        onchange={handleDayOfWeekChange}
-                    ></lightning-checkbox-group>
-                </lightning-layout-item>
-                
-            </lightning-layout>
+            <!-- COURSE SESSIONS -->
+            <template lwc:if={isCourseSession}>
+                <lightning-layout class="slds-var-m-around_x-large">
+                    <lightning-layout-item flexibility="auto" class="layout-item">
+                        <lightning-input
+                            type="checkbox"
+                            checked={filters.showUnavailableCourseOptions}
+                            onchange={handleFilterChange}
+                            label="Show Unavailable Course Options"
+                            name="showUnavailableCourseOptions"
+                        ></lightning-input>
+                        <lightning-combobox
+                            name="courseOptionId"
+                            label="Course Option"
+                            value={filters.courseOptionId}
+                            placeholder="All Course Options"
+                            options={courseOptionOptions}
+                            onchange={handleFilterChange}
+                            disabled={courseOptionIdIsDisabled}
+                            class="slds-var-p-top_small"
+                        ></lightning-combobox>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+
+            <!-- COURSES AND PROGRAMS -->
+            <template lwc:else>
+                <lightning-layout>
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <lightning-combobox
+                            name="Location"
+                            label="Location"
+                            value={filters.Location}
+                            placeholder="All Locations"
+                            options={locationOptions}
+                            onchange={handleFilterChange}
+                            disabled={locationIsDisabled}
+                        ></lightning-combobox>
+                        <lightning-combobox
+                            name="session"
+                            label="Session"
+                            value={filters.session}
+                            placeholder="All Sessions"
+                            options={sessionOptions}
+                            onchange={handleFilterChange}
+                            disabled={sessionIsDisabled}
+                        ></lightning-combobox>
+                        <lightning-input 
+                            type="date" 
+                            name="startDate" 
+                            label="Start Date" 
+                            value={filters.startDate}
+                            onchange={handleFilterChange}
+                        ></lightning-input>
+                        <lightning-input 
+                            type="date" 
+                            name="endDate" 
+                            label="End Date" 
+                            value={filters.endDate}
+                            onchange={handleFilterChange}
+                        ></lightning-input>
+                    </lightning-layout-item>
+    
+                    <lightning-layout-item flexibility="auto" padding="around-small">
+                        <lightning-input 
+                            type="number" 
+                            name="age" 
+                            value={filters.age} 
+                            onchange={handleFilterChange} 
+                            label="Age"
+                        ></lightning-input>
+                        <lightning-checkbox-group 
+                            name="dayOfWeek"
+                            label="Days of Week"
+                            options={daysOfWeek}
+                            value={filters.dayOfWeek}
+                            onchange={handleFilterChange}
+                        ></lightning-checkbox-group>
+                    </lightning-layout-item>
+                    
+                </lightning-layout>
+            </template>
+            
         </div>
 
     </lightning-card>

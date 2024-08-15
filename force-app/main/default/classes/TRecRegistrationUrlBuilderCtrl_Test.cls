@@ -3,64 +3,14 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
 
     private static final String SESSION_STATUS_AVAILABLE = 'Available';
     private static final String SESSION_STATUS_DRAFT = 'Draft';
+    private static final String COURSE_OPTION_TYPE_STANDARD = 'Standard Course Option';
+
+    private static Date startDate = Date.today();
+    private static Date endDate = Date.today().addDays(30);
 
     @TestSetup
     static void makeData() {
-        TREX1__App_Config__c appConfig = TREX1__App_Config__c.getOrgDefaults();
-        appConfig.TREX1__Self_Reg_Redirect__c = 'https://my-test-community.com';
-        upsert appConfig;
-
-        List<TREX1__Session__c> sessions = new List<TREX1__Session__c>();
-        Date startDate = Date.today();
-        Date endDate = Date.today().addDays(30);
-        sessions.add(
-            new TREX1__Session__c(
-                Name = 'Available Session',
-                TREX1__Available__c = true,
-                TREX1__Available_Online__c = true,
-                TREX1__Available_Online_From__c = startDate,
-                TREX1__Available_Online_To__c = endDate,
-                TREX1__Register_From_Date__c = startDate,
-                TREX1__Register_To_Date__c = endDate,
-                TREX1__Register_Online_From_Date__c = startDate,
-                TREX1__Register_Online_To_Date__c = endDate,
-                TREX1__Start_Date__c = startDate,
-                TREX1__End_Date__c = endDate,
-                TREX1__Status__c = SESSION_STATUS_AVAILABLE
-            )
-        );
-        sessions.add(
-            new TREX1__Session__c(
-                Name = 'Draft Session',
-                TREX1__Available__c = true,
-                TREX1__Available_Online__c = true,
-                TREX1__Available_Online_From__c = startDate,
-                TREX1__Available_Online_To__c = endDate,
-                TREX1__Register_From_Date__c = startDate,
-                TREX1__Register_To_Date__c = endDate,
-                TREX1__Register_Online_From_Date__c = startDate,
-                TREX1__Register_Online_To_Date__c = endDate,
-                TREX1__Start_Date__c = startDate,
-                TREX1__End_Date__c = endDate,
-                TREX1__Status__c = SESSION_STATUS_DRAFT
-            )
-        );
-        insert sessions;
-
-        List<TREX1__Location__c> locations = new List<TREX1__Location__c>();
-        locations.add(
-            new TREX1__Location__c(
-                Name = 'Available Location',
-                TREX1__Available_for_Location_Filter_Community__c = true
-            )
-        );
-        locations.add(
-            new TREX1__Location__c(
-                Name = 'Unavailable Location',
-                TREX1__Available_for_Location_Filter_Community__c = false
-            )
-        );
-        insert locations;
+        loadData();
     }
 
     @IsTest
@@ -133,6 +83,151 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
 
         Assert.isTrue(returnedLocations.size() == 1, 'Should have received only one location');
         Assert.areEqual(availableLocations[0].Id, returnedLocations[0].Id, 'Should have received the correct location id');
+    }
+
+    /**
+     * Test Data Setup
+     */
+
+    private static void loadData() {
+        loadAppConfig();
+        loadProgramStack();
+    }
+
+    private static void loadAppConfig() {
+        TREX1__App_Config__c appConfig = TREX1__App_Config__c.getOrgDefaults();
+        appConfig.TREX1__Self_Reg_Redirect__c = 'https://my-test-community.com';
+        upsert appConfig;
+    }
+
+    private static void loadProgramStack() {
+        TREX1__Location__c availableLocation = loadLocations();
+        TREX1__Session__c availableSession = loadSessions();
+
+        TREX1__Program__c program = new TREX1__Program__c(
+            Name = 'Test Program',
+            TREX1__Available__c = true,
+            TREX1__Available_Online__c = true
+        );
+        insert program;
+
+        TREX1__Course__c course = new TREX1__Course__c(
+            TREX1__Program__c = program.Id,
+            Name = 'Test Course',
+            TREX1__Available__c = true, 
+            TREX1__Available_Online__c = true
+        );
+        insert course;
+
+        TREX1__Course_Session__c courseSession = new TREX1__Course_Session__c(
+            TREX1__Course__c = course.Id,
+            TREX1__Session__c = availableSession.Id,
+            Name = 'Test Course Session',
+            TREX1__Status__c = 'Approved'
+        );
+        insert courseSession;
+
+        Set<String> daysOfWeek = new Set<String>{'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'};
+
+        List<TREX1__Course_Option__c> courseOptions = new List<TREX1__Course_Option__c>();
+        Boolean isAvailable = false;
+        for (String day : daysOfWeek) {
+            courseOptions.add(
+                new TREX1__Course_Option__c(
+                    Name = 'Test Course Option - ' + day, 
+                    TREX1__Available__c = isAvailable,
+                    TREX1__Available_Online__c = isAvailable,
+                    TREX1__Type__c = COURSE_OPTION_TYPE_STANDARD, 
+                    TREX1__Start_Date__c = startDate, 
+                    TREX1__End_Date__c = endDate, 
+                    TREX1__Start_Time__c = '1:00 PM', 
+                    TREX1__End_Time__c = '2:00 PM', 
+                    TREX1__Day_of_Week__c = day, 
+                    TREX1__Setup_Time_Required__c = 0, 
+                    TREX1__Tear_Down_Time_Required__c = 0, 
+                    TREX1__Capacity__c = 100, 
+                    TREX1__Register_From_Date__c = startDate, 
+                    TREX1__Register_From_Time__c = '8:30 AM', 
+                    TREX1__Register_To_Date__c = endDate, 
+                    TREX1__Register_To_Time__c = '10:30 PM', 
+                    TREX1__Register_Online_From_Date__c = startDate, 
+                    TREX1__Register_Online_From_Time__c = '8:30 AM', 
+                    TREX1__Register_Online_To_Date__c = endDate, 
+                    TREX1__Register_Online_To_Time__c = '10:30 PM'
+                )
+            );
+            isAvailable = true;
+        }
+        insert courseOptions;
+
+        List<TREX1__Course_Session_Option__c> csos = new List<TREX1__Course_Session_Option__c>();
+        for (TREX1__Course_Option__c co : courseOptions) {
+            csos.add(
+                new TREX1__Course_Session_Option__c(
+                    TREX1__Course_Option__c = co.Id,
+                    TREX1__Course_Session__c = courseSession.Id,
+                    TREX1__Option_Available__c = co.TREX1__Available__c,
+                    TREX1__Available_Online__c = co.TREX1__Available_Online__c
+                )
+            );
+        }
+        insert csos;
+    }
+
+    private static TREX1__Location__c loadLocations() {
+        List<TREX1__Location__c> locations = new List<TREX1__Location__c>();
+
+        TREX1__Location__c availableLocation = new TREX1__Location__c(
+            Name = 'Available Location',
+            TREX1__Available_for_Location_Filter_Community__c = true
+        );
+        locations.add(availableLocation);
+
+        TREX1__Location__c unavailableLocation = new TREX1__Location__c(
+            Name = 'Unavailable Location',
+            TREX1__Available_for_Location_Filter_Community__c = false
+        );
+        locations.add(unavailableLocation);
+
+        insert locations;
+        return availableLocation;
+    }
+
+    private static TREX1__Session__c loadSessions() {
+        List<TREX1__Session__c> sessions = new List<TREX1__Session__c>();
+        TREX1__Session__c availableSession = new TREX1__Session__c(
+            Name = 'Available Session',
+            TREX1__Available__c = true,
+            TREX1__Available_Online__c = true,
+            TREX1__Available_Online_From__c = startDate,
+            TREX1__Available_Online_To__c = endDate,
+            TREX1__Register_From_Date__c = startDate,
+            TREX1__Register_To_Date__c = endDate,
+            TREX1__Register_Online_From_Date__c = startDate,
+            TREX1__Register_Online_To_Date__c = endDate,
+            TREX1__Start_Date__c = startDate,
+            TREX1__End_Date__c = endDate,
+            TREX1__Status__c = SESSION_STATUS_AVAILABLE
+        );
+        sessions.add(availableSession);
+
+        TREX1__Session__c unavailableSession = new TREX1__Session__c(
+            Name = 'Draft Session',
+            TREX1__Available__c = true,
+            TREX1__Available_Online__c = true,
+            TREX1__Available_Online_From__c = startDate,
+            TREX1__Available_Online_To__c = endDate,
+            TREX1__Register_From_Date__c = startDate,
+            TREX1__Register_To_Date__c = endDate,
+            TREX1__Register_Online_From_Date__c = startDate,
+            TREX1__Register_Online_To_Date__c = endDate,
+            TREX1__Start_Date__c = startDate,
+            TREX1__End_Date__c = endDate,
+            TREX1__Status__c = SESSION_STATUS_DRAFT
+        );
+        sessions.add(unavailableSession);
+        insert sessions;
+        return availableSession;
     }
 
 }

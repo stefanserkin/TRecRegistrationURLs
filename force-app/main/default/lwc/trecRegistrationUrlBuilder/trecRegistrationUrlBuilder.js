@@ -6,7 +6,8 @@ import { refreshApex } from '@salesforce/apex';
 import getBaseUrl from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getBaseUrl';
 import getAvailableSessions from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getAvailableSessions';
 import getAvailableLocations from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getAvailableLocations';
-import userCanGetPublicUrl from '@salesforce/customPermission/Can_Get_Public_URL';
+import getCourseOptions from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getCourseOptions';
+import userCanGetPublicUrl from '@salesforce/customPermission/Can_Get_Public_Registration_URL';
 
 const DAYS_OF_WEEK = [
     { label: 'Sunday', value: 'Sunday' },
@@ -34,32 +35,52 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     /*************************
      * Wired results and data
      *************************/
-    daysOfWeek = DAYS_OF_WEEK;
     wiredRecord = [];
     wiredBaseUrl = [];
-    wiredSessions = [];
     wiredLocations = [];
+    wiredSessions = [];
+    wiredCourseOptions = [];
+    
     baseUrl;
-    @track sessionOptions;
     @track locationOptions;
+    @track sessionOptions;
+    @track courseOptionOptions;
+    daysOfWeek = DAYS_OF_WEEK;
 
     /*************************
      * Selected Filters
      *************************/
-    filteredLocation;
-    filteredSession;
-    filteredStartDate;
-    filteredEndDate;
-    filteredDays = [];
-    filteredAge;
+    @track filters = this.emptyFilters;
+
+    get emptyFilters() {
+        return {
+            'Location': undefined,
+            'session': undefined,
+            'startDate': undefined,
+            'endDate': undefined,
+            'dayOfWeek': [],
+            'age': undefined,
+            'courseOptionId': undefined,
+            'showUnavailableCourseOptions': false
+        };
+    }
 
     /*************************
      * Object-Dependent Properties
      *************************/
     objectMap = {
-        'TREX1__Program__c': { fields: ['TREX1__Program__c.Name'], filterName: 'program' },
-        'TREX1__Course__c': { fields: ['TREX1__Course__c.Name'], filterName: 'course' },
-        'TREX1__Course_Session__c': { fields: ['TREX1__Course_Session__c.Name'], filterName: 'courseSession' }
+        'TREX1__Program__c': { 
+            fields: ['TREX1__Program__c.Name'], 
+            filterName: 'program' 
+        },
+        'TREX1__Course__c': { 
+            fields: ['TREX1__Course__c.Name'], 
+            filterName: 'course' 
+        },
+        'TREX1__Course_Session__c': { 
+            fields: ['TREX1__Course_Session__c.Name'], 
+            filterName: 'courseSession' 
+        }
     };
 
     get recordFields() {
@@ -68,6 +89,10 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
 
     get recordFilterName() {
         return this.objectMap[this.objectApiName]?.filterName || '';
+    }
+
+    get isCourseSession() {
+        return this.objectApiName && this.objectApiName === 'TREX1__Course_Session__c';
     }
 
     /*************************
@@ -101,15 +126,17 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     wiredBaseUrlResult(result) {
         this.wiredBaseUrl = result;
         if (result.data) {
-            if (this.registrationUrlPath.startsWith('/s')) {
-                this.registrationUrlPath = this.registrationUrlPath.substring(2);
+            let url = result.data;
+            if (this.registrationUrlPath) {
+                if (!this.registrationUrlPath.startsWith('/')) {
+                    this.registrationUrlPath = '/' + this.registrationUrlPath;
+                }
+                if (this.registrationUrlPath.startsWith('/s/')) {
+                    this.registrationUrlPath = this.registrationUrlPath.substring(2);
+                }
+                url += this.registrationUrlPath;
             }
-            if (!this.registrationUrlPath.startsWith('/')) {
-                this.registrationUrlPath = '/' + this.registrationUrlPath;
-            }
-            this.baseUrl = this.registrationUrlPath
-                ? result.data + this.registrationUrlPath
-                : result.data;
+            this.baseUrl = url;
         } else if (result.error) {
             this.error = result.error;
             this.handleError(this.error);
@@ -158,6 +185,28 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         }
     }
 
+    @wire(getCourseOptions, {courseSessionId: '$recordId', showUnavailable: '$filters.showUnavailableCourseOptions'})
+    wiredCourseOptions(result) {
+        this.isLoading = true;
+        this.wiredCourseOptions = result;
+        if (this.isCourseSession) {
+            if (result.data) {
+                this.courseOptionOptions = result.data.map(row => ({
+                    label: row.Name,
+                    value: row.Id
+                }));
+                this.isLoading = false;
+            } else if (result.error) {
+                this.courseOptionOptions = undefined;
+                this.error = result.error;
+                this.handleError(this.error);
+                this.isLoading = false;
+            }
+        } else {
+            this.isLoading = false;
+        }
+    }
+
     get sessionIsDisabled() {
         return !this.sessionOptions || this.sessionOptions.length === 0;
     }
@@ -166,13 +215,29 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         return !this.locationOptions || this.locationOptions.length === 0;
     }
 
+    get courseOptionIdIsDisabled() {
+        return !this.courseOptionOptions || this.courseOptionOptions.length === 0;
+    }
+
     /*************************
      * URL Construction
      *************************/
     get url() {
-        let result = `${this.baseUrl}?${this.recordFilter}`;
-        if (this.filteredLocation) {
-            result += `&Location=${encodeURI(this.filteredLocation)}`;
+        return this.isCourseSession ? this.deepLinkUrl : this.filteredUrl;
+    }
+
+    get deepLinkUrl() {
+        let url = `${this.baseUrl}?courseSessionId=${this.recordId}`;
+        if (this.filters.courseOptionId) {
+            url += `&courseOptionId=${this.filters.courseOptionId}`;
+        }
+        return url;
+    }
+
+    get filteredUrl() {
+        let result = `${this.baseUrl}?${this.recordFilterName}=${encodeURI(this.recordName)}`;
+        if (this.filters.Location) {
+            result += `&Location=${encodeURI(this.filters.Location)}`;
         }
         if (this.hasFilters) {
             result += `&filters=${this.filterString}`;
@@ -180,61 +245,43 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         return result;
     }
 
-    get recordFilter() {
-        return `${this.recordFilterName}=${encodeURI(this.recordName)}`;
-    }
-
     get hasFilters() {
-        return this.filteredSession ||
-            this.filteredStartDate ||
-            this.filteredEndDate ||
-            this.filteredDays.length > 0 ||
-            this.filteredAge;
+        return this.filters.session ||
+            this.filters.startDate ||
+            this.filters.endDate ||
+            this.filters.dayOfWeek.length > 0 ||
+            this.filters.age;
     }
 
     get filterString() {
-        let filters = {};
-        if (this.filteredSession) {
-            filters.session = this.filteredSession;
+        let urlFilters = {};
+        const filters = this.filters;
+        if (filters.session) {
+            urlFilters.session = filters.session;
         }
-        if (this.filteredStartDate || this.filteredEndDate) {
-            const filteredDateRange = [this.filteredStartDate, this.filteredEndDate];
-            filters.dateRange = filteredDateRange;
+        if (filters.startDate || filters.endDate) {
+            const dateRange = [filters.startDate, filters.endDate];
+            urlFilters.dateRange = dateRange;
         }
-        if (this.filteredDays.length > 0) {
-            filters.daysOfWeek = this.filteredDays;
+        if (filters.dayOfWeek.length > 0) {
+            urlFilters.dayOfWeek = filters.dayOfWeek;
         }
-        if (this.filteredAge) {
-            filters.age = this.filteredAge;
+        if (filters.age) {
+            urlFilters.age = this.filters.age;
         }
-        return JSON.stringify(filters);
+        return JSON.stringify(urlFilters);
     }
 
     /*************************
      * Event Handlers
      *************************/
-    handleLocationChange(event) {
-        this.filteredLocation = event.detail.value;
-    }
-
-    handleSessionChange(event) {
-        this.filteredSession = event.detail.value;
-    }
-
-    handleStartDateChange(event) {
-        this.filteredStartDate = event.detail.value;
-    }
-
-    handleEndDateChange(event) {
-        this.filteredEndDate = event.detail.value;
-    }
-
-    handleDayOfWeekChange(event) {
-        this.filteredDays = event.detail.value;
-    }
-    
-    handleAgeChange(event) {
-        this.filteredAge = event.detail.value;
+    handleFilterChange(event) {
+        const changedFilter = event.target.name;
+        if (event.target.type === 'checkbox') {
+            this.filters[changedFilter] = event.target.checked;
+        } else {
+            this.filters[changedFilter] = event.detail.value;
+        }
     }
 
     /*************************
@@ -280,19 +327,10 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     }
 
     handleRefreshComponent() {
-        this.clearFilters();
+        this.filters = this.emptyFilters;
         refreshApex(this.wiredUrl);
         refreshApex(this.wiredLocations);
         refreshApex(this.wiredSessions);
-    }
-
-    clearFilters() {
-        this.filteredLocation = undefined;
-        this.filteredSession = undefined;
-        this.filteredStartDate = undefined;
-        this.filteredEndDate = undefined;
-        this.filteredDays = [];
-        this.filteredAge = undefined;
     }
 
     /*************************
