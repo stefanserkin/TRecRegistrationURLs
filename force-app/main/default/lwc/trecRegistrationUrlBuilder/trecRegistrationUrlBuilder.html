@@ -1,0 +1,108 @@
+<template>
+    <lightning-card title="Get Public URL" icon-name="action:web_link">
+
+        <!-- ACTIONS -->
+        <div slot="actions">
+            <lightning-button-stateful
+                label-when-off="Copy"
+                label-when-on="Copied!"
+                label-when-hover="Copied!"
+                icon-name-when-off="utility:copy"
+                icon-name-when-on="utility:check"
+                icon-name-when-hover="utility:check"
+                onclick={handleCopyUrl}
+                selected={urlIsCopied}
+                class="slds-m-left_x-small"
+            ></lightning-button-stateful>
+            <lightning-button-icon-stateful
+                icon-name="utility:filterList"
+                alternative-text="Apply Filters"
+                title="Apply Filters"
+                selected={showFilterPanel}
+                onclick={handleToggleFilterPanel}
+                class="slds-m-left_x-small"
+            ></lightning-button-icon-stateful>
+            <lightning-button-icon
+                icon-name="utility:refresh"
+                alternative-text="Reset Filters"
+                title="Reset Filters"
+                onclick={handleRefreshComponent}
+                class="slds-m-left_x-small"
+            ></lightning-button-icon>
+            <lightning-button-icon
+                icon-name="utility:new_window"
+                alternative-text="Go to URL"
+                title="Go to URL"
+                onclick={handleGoToUrl}
+                class="slds-m-left_x-small"
+            ></lightning-button-icon>
+        </div>
+
+        <!-- URL DISPLAY -->
+        <div lwc:if={baseUrl} class="url-display slds-var-m-around_medium">                        
+            <div class="slds-var-m-around_small url-output">
+                <span class="slds-text-color_default">{url}</span>
+            </div>
+        </div>
+
+        <!-- FILTER PANEL -->
+        <div lwc:if={showFilterPanel} class="filter-panel slds-var-m-around_small">
+            <lightning-layout>
+                <lightning-layout-item flexibility="auto" padding="around-small">
+                    <lightning-combobox
+                        name="Location"
+                        label="Location"
+                        value={filteredLocation}
+                        placeholder="All Locations"
+                        options={locationOptions}
+                        onchange={handleLocationChange}
+                        disabled={locationsIsDisabled}
+                    ></lightning-combobox>
+                    <lightning-combobox
+                        name="session"
+                        label="Session"
+                        value={filteredSession}
+                        placeholder="All Sessions"
+                        options={sessionOptions}
+                        onchange={handleSessionChange}
+                        disabled={sessionsIsDisabled}
+                    ></lightning-combobox>
+                    <lightning-input 
+                        type="date" 
+                        name="Start Date" 
+                        label="Start Date" 
+                        value={filteredStartDate}
+                        onchange={handleStartDateChange}
+                    ></lightning-input>
+                    <lightning-input 
+                        type="date" 
+                        name="End Date" 
+                        label="End Date" 
+                        value={filteredEndDate}
+                        onchange={handleEndDateChange}
+                    ></lightning-input>
+                </lightning-layout-item>
+
+                <lightning-layout-item flexibility="auto" padding="around-small">
+                    <lightning-input 
+                        type="number" 
+                        name="age" 
+                        value={filteredAge} 
+                        onchange={handleAgeChange} 
+                        label="Age"
+                    ></lightning-input>
+                    <lightning-checkbox-group 
+                        name="dayOfWeek"
+                        label="Days of Week"
+                        options={daysOfWeek}
+                        value={filteredDays}
+                        onchange={handleDayOfWeekChange}
+                    ></lightning-checkbox-group>
+                </lightning-layout-item>
+                
+            </lightning-layout>
+        </div>
+
+    </lightning-card>
+
+</template>

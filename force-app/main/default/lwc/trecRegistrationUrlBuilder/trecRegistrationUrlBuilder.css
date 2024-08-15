@@ -1,0 +1,14 @@
+.url-output {
+    display: block;
+    padding: 0.5rem;
+    background-color: #f4f6f9;
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+    font-family: "Salesforce Sans", Arial, sans-serif;
+    word-break: break-all;
+}
+
+.url-output span {
+    display: inline-block;
+    margin-top: 0.25rem;
+}

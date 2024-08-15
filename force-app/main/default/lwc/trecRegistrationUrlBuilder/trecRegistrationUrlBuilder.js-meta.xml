@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>61.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Get Public URL</masterLabel>
+    <description>Access the TRec Registration URL Builder</description>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>TREX1__Program__c</object>
+                <object>TREX1__Course__c</object>
+                <object>TREX1__Course_Session__c</object>
+            </objects>
+            <property 
+                name="registrationUrlPath" 
+                type="String" 
+                default="/registration" 
+                label="Registration URL Path"
+                description="The relative URL path to the registration page in the community. Example: /registration"
+            />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
