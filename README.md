@@ -4,8 +4,8 @@ Traction Rec offers a number of parameters to load filtered results in the Commu
 
 ## Docs
 
+- [Project Quip](https://quip.com/Zp3FAf21WOuq/Get-Public-URL)
 - [Deep Linking in Traction Rec](https://success.tractionrec.com/s/article/Web-Registration-URL-Parameters)
-- [Quip](https://quip.com/Zp3FAf21WOuq/Get-Public-URL)
 
 ## Post-Installation Steps
 
