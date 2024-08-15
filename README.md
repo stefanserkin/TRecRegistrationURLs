@@ -1,18 +1,15 @@
-# Salesforce DX Project: Next Steps
+# Get Public Registration URLs in Traction Rec
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+Traction Rec offers a number of parameters to load filtered results in the Community Registration component when a user lands on a community page. This component gives internal users a way to quickly generate filtered URLs from Program, Course, and Course Session record pages.
 
-## How Do You Plan to Deploy Your Changes?
+## Docs
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+- [Quip](https://quip.com/Zp3FAf21WOuq/Get-Public-URL)
 
-## Configure Your Salesforce DX Project
+## Post-Installation Steps
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
-
-## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+1. **Add Get Public URL component** to Program, Course, and/or Course Session record pages.
+2. **Add Traction Rec Get Public URL permission set** to users that should be able to access the component.
+    - Alternatively, add the following access to an existing permission set:
+        - **Apex Class**: `TRecRegistrationUrlBuilderCtrl`
+        - **Custom Permission**: `Can Get Public URL`
