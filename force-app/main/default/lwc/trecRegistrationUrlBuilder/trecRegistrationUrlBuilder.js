@@ -255,8 +255,8 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
                     this.showToast('Success', 'URL copied to clipboard', 'success');
                 })
                 .catch(error => {
-                    this.error = error;
-                    this.showToast('Error', 'URL could not be copied', `Error: ${this.error}`);
+                    const errorMessage = error && error.message ? error.message : 'URL could not be copied';
+                    this.showToast('Error', errorMessage, 'error');
                 });
         } else {
             let input = document.createElement("input");
@@ -272,7 +272,7 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         this.urlIsCopied = true;
         setTimeout(() => {
             this.urlIsCopied = false;
-        }, 5000);
+        }, 4000);
     }
 
     handleGoToUrl() {

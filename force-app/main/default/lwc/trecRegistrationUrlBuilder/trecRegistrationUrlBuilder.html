@@ -1,5 +1,5 @@
 <template>
-    <lightning-card title="Get Public URL" icon-name="action:web_link">
+    <lightning-card lwc:if={userHasComponentAccess} title="Get Public URL" icon-name="action:web_link">
 
         <!-- ACTIONS -->
         <div slot="actions">
