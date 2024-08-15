@@ -16,7 +16,7 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
     @IsTest
     static void testGetBaseUrl() {
         Test.startTest();
-        String baseUrl = PublicUrlBuilderController.getBaseUrl();
+        String baseUrl = TRecRegistrationUrlBuilderCtrl.getBaseUrl();
         Test.stopTest();
 
         TREX1__App_Config__c appConfig = TREX1__App_Config__c.getOrgDefaults();
@@ -29,7 +29,7 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
     static void testGetBaseUrlWithoutAppConfig() {
         delete [SELECT Id FROM TREX1__App_Config__c];
         Test.startTest();
-        String baseUrl = PublicUrlBuilderController.getBaseUrl();
+        String baseUrl = TRecRegistrationUrlBuilderCtrl.getBaseUrl();
         Test.stopTest();
         Assert.areEqual('/s', baseUrl, 'Should have received a relative url');
     }
@@ -44,7 +44,7 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         ];
 
         Test.startTest();
-        List<TREX1__Session__c> returnedSessions = PublicUrlBuilderController.getAvailableSessions();
+        List<TREX1__Session__c> returnedSessions = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
         Test.stopTest();
 
         Assert.isTrue(returnedSessions.size() == 1, 'Should have received only the active session');
@@ -63,10 +63,25 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         update availableSession;
 
         Test.startTest();
-        List<TREX1__Session__c> returnedSessions = PublicUrlBuilderController.getAvailableSessions();
+        List<TREX1__Session__c> returnedSessions = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
         Test.stopTest();
 
         Assert.isTrue(returnedSessions.isEmpty(), 'Should have received an empty list');
+    }
+
+    @IsTest
+    static void testGetSessionsWithException() {
+        User u = createMinimumAccessUser();
+        Test.startTest();
+        System.runAs(u) {
+            try {
+                List<TREX1__Session__c> returnedSessions = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
+                Assert.fail('Should have received an exception for insufficient permissions');
+            } catch (Exception e) {
+                Assert.areEqual('System.AuraHandledException', e.getTypeName(), 'Should have received an aura handled exception');
+            }
+        }
+        Test.stopTest();
     }
 
     @IsTest
@@ -78,11 +93,90 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         ];
 
         Test.startTest();
-        List<TREX1__Location__c> returnedLocations = PublicUrlBuilderController.getAvailableLocations();
+        List<TREX1__Location__c> returnedLocations = TRecRegistrationUrlBuilderCtrl.getAvailableLocations();
         Test.stopTest();
 
         Assert.isTrue(returnedLocations.size() == 1, 'Should have received only one location');
         Assert.areEqual(availableLocations[0].Id, returnedLocations[0].Id, 'Should have received the correct location id');
+    }
+
+    @IsTest
+    static void testGetLocationsWithException() {
+        User u = createMinimumAccessUser();
+        Test.startTest();
+        System.runAs(u) {
+            try {
+                List<TREX1__Location__c> returnedLocations = TRecRegistrationUrlBuilderCtrl.getAvailableLocations();
+                Assert.fail('Should have received an exception for insufficient permissions');
+            } catch (Exception e) {
+                Assert.areEqual('System.AuraHandledException', e.getTypeName(), 'Should have received an aura handled exception');
+            }
+        }
+        Test.stopTest();
+    }
+
+    @IsTest
+    static void testGetAvailableCourseOptions() {
+        TREX1__Course_Session__c courseSession = [SELECT Id FROM TREX1__Course_Session__c LIMIT 1];
+        List<TREX1__Course_Option__c> courseOptions = [
+            SELECT Id 
+              FROM TREX1__Course_Option__c
+             WHERE Id IN (SELECT TREX1__Course_Option__c 
+                            FROM TREX1__Course_Session_Option__c
+                           WHERE TREX1__Course_Session__c = :courseSession.Id
+                             AND (TREX1__Course_Option__r.TREX1__Visible_External_Users__c = true
+                              OR TREX1__Course_Online_Availability__c = ''))
+        ];
+
+        Test.startTest();
+        List<TREX1__Course_Option__c> returnedOptions = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
+            courseSession.Id, 
+            false
+        );
+        Test.stopTest();
+
+        Assert.areEqual(courseOptions.size(), returnedOptions.size(), 'Should have received only available course options');
+    }
+
+    @IsTest
+    static void testGetAllCourseOptions() {
+        TREX1__Course_Session__c courseSession = [SELECT Id FROM TREX1__Course_Session__c LIMIT 1];
+        List<TREX1__Course_Option__c> courseOptions = [
+            SELECT Id 
+              FROM TREX1__Course_Option__c
+             WHERE Id IN (SELECT TREX1__Course_Option__c 
+                            FROM TREX1__Course_Session_Option__c
+                           WHERE TREX1__Course_Session__c = :courseSession.Id)
+        ];
+
+        Test.startTest();
+        List<TREX1__Course_Option__c> returnedOptions = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
+            courseSession.Id, 
+            true
+        );
+        Test.stopTest();
+
+        Assert.areEqual(courseOptions.size(), returnedOptions.size(), 'Should have received all course options for the course session');
+    }
+
+    @IsTest
+    static void testGetCourseOptionsWithException() {
+        TREX1__Course_Session__c courseSession = [SELECT Id FROM TREX1__Course_Session__c LIMIT 1];
+
+        User u = createMinimumAccessUser();
+        Test.startTest();
+        System.runAs(u) {
+            try {
+                List<TREX1__Course_Option__c> returnedOptions = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
+                    courseSession.Id, 
+                    true
+                );
+                Assert.fail('Should have received an exception for insufficient permissions');
+            } catch (Exception e) {
+                Assert.areEqual('System.AuraHandledException', e.getTypeName(), 'Should have received an aura handled exception');
+            }
+        }
+        Test.stopTest();
     }
 
     /**
@@ -228,6 +322,29 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         sessions.add(unavailableSession);
         insert sessions;
         return availableSession;
+    }
+
+    private static User createMinimumAccessUser() {
+        String orgId = UserInfo.getOrganizationId();
+        String dateString = String.valueof(Datetime.now()).replace(' ', '').replace(':', '').replace('-', '');
+        Integer randomInt = Integer.valueOf(Math.rint(Math.random() * 1000000));
+        String uniqueName = orgId + dateString + randomInt;
+        
+        Profile profile = [SELECT Id FROM Profile WHERE Name = 'Minimum Access - Salesforce'];
+        User u = new User();
+        u.IsActive = true;
+        u.TimeZoneSidKey = UserInfo.getTimeZone().toString();
+        u.LocaleSidKey = UserInfo.getLocale();
+        u.LanguageLocaleKey = UserInfo.getLocale();
+        u.EmailEncodingKey = 'ISO-8859-1';
+        u.Username = uniqueName + '@test' + orgId + '.org';
+        u.Email = uniqueName + '@test' + orgId + '.org';
+        u.FirstName = 'Tester';
+        u.LastName = 'Testerooni';
+        u.Alias = uniqueName.substring(18, 23);
+        u.ProfileId = profile.Id;
+        insert u;
+        return u;
     }
 
 }
