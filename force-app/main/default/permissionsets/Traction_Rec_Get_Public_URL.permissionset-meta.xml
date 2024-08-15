@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>TRecRegistrationUrlBuilderCtrl</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Can_Get_Public_URL</name>
+    </customPermissions>
+    <description>Access to the Get Public URL component for Traction Rec record pages</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Traction Rec Get Public URL</label>
+</PermissionSet>
