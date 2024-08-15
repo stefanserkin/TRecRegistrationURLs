@@ -56,7 +56,7 @@
                         placeholder="All Locations"
                         options={locationOptions}
                         onchange={handleLocationChange}
-                        disabled={locationsIsDisabled}
+                        disabled={locationIsDisabled}
                     ></lightning-combobox>
                     <lightning-combobox
                         name="session"
@@ -65,7 +65,7 @@
                         placeholder="All Sessions"
                         options={sessionOptions}
                         onchange={handleSessionChange}
-                        disabled={sessionsIsDisabled}
+                        disabled={sessionIsDisabled}
                     ></lightning-combobox>
                     <lightning-input 
                         type="date" 

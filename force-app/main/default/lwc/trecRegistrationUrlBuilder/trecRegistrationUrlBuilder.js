@@ -27,20 +27,6 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     recordName;
     error;
 
-    objectMap = {
-        'TREX1__Program__c': { fields: ['TREX1__Program__c.Name'], filterName: 'program' },
-        'TREX1__Course__c': { fields: ['TREX1__Course__c.Name'], filterName: 'course' },
-        'TREX1__Course_Session__c': { fields: ['TREX1__Course_Session__c.Name'], filterName: 'courseSession' }
-    };
-
-    get recordFields() {
-        return this.objectMap[this.objectApiName]?.fields || [];
-    }
-
-    get recordFilterName() {
-        return this.objectMap[this.objectApiName]?.filterName || '';
-    }
-
     isLoading = false;
     showFilterPanel = false;
     urlIsCopied = false;
@@ -68,9 +54,32 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     filteredAge;
 
     /*************************
+     * Object-Dependent Properties
+     *************************/
+    objectMap = {
+        'TREX1__Program__c': { fields: ['TREX1__Program__c.Name'], filterName: 'program' },
+        'TREX1__Course__c': { fields: ['TREX1__Course__c.Name'], filterName: 'course' },
+        'TREX1__Course_Session__c': { fields: ['TREX1__Course_Session__c.Name'], filterName: 'courseSession' }
+    };
+
+    get recordFields() {
+        return this.objectMap[this.objectApiName]?.fields || [];
+    }
+
+    get recordFilterName() {
+        return this.objectMap[this.objectApiName]?.filterName || '';
+    }
+
+    /*************************
+     * User Access
+     *************************/
+    get userHasComponentAccess() {
+        return userCanGetPublicUrl;
+    }
+
+    /*************************
      * Get Data
      *************************/
-
     @wire(getRecord, { recordId: '$recordId', fields: '$recordFields' })
     wiredRecordResult(result) {
         this.isLoading = true;
@@ -149,18 +158,17 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         }
     }
 
-    get sessionsIsDisabled() {
+    get sessionIsDisabled() {
         return !this.sessionOptions || this.sessionOptions.length === 0;
     }
 
-    get locationsIsDisabled() {
+    get locationIsDisabled() {
         return !this.locationOptions || this.locationOptions.length === 0;
     }
 
     /*************************
      * URL Construction
      *************************/
-
     get url() {
         let result = `${this.baseUrl}?${this.recordFilter}`;
         if (this.filteredLocation) {
@@ -205,7 +213,6 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     /*************************
      * Event Handlers
      *************************/
-
     handleLocationChange(event) {
         this.filteredLocation = event.detail.value;
     }
@@ -233,7 +240,6 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     /*************************
      * Actions
      *************************/
-
     handleToggleFilterPanel() {
         this.showFilterPanel = !this.showFilterPanel;
     }
@@ -292,7 +298,6 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     /*************************
      * Utils
      *************************/
-
     handleError(error) {
         let message = 'Unknown error';
         if (Array.isArray(error.body)) {
