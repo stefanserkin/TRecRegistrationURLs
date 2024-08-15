@@ -27,14 +27,18 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     recordName;
     error;
 
-    fieldMap = {
-        'TREX1__Program__c': ['TREX1__Program__c.Name'],
-        'TREX1__Course__c': ['TREX1__Course__c.Name'],
-        'TREX1__Course_Session__c': ['TREX1__Course_Session__c.Name']
+    objectMap = {
+        'TREX1__Program__c': { fields: ['TREX1__Program__c.Name'], filterName: 'program' },
+        'TREX1__Course__c': { fields: ['TREX1__Course__c.Name'], filterName: 'course' },
+        'TREX1__Course_Session__c': { fields: ['TREX1__Course_Session__c.Name'], filterName: 'courseSession' }
     };
 
     get recordFields() {
-        return this.fieldMap[this.objectApiName] || [];
+        return this.objectMap[this.objectApiName]?.fields || [];
+    }
+
+    get recordFilterName() {
+        return this.objectMap[this.objectApiName]?.filterName || '';
     }
 
     isLoading = false;
@@ -169,19 +173,7 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     }
 
     get recordFilter() {
-        let recordType = '';
-        switch (this.objectApiName) {
-            case 'TREX1__Program__c':
-                recordType = 'program';
-                break;
-            case 'TREX1__Course__c':
-                recordType = 'course';
-                break;
-            case 'TREX1__Course_Session__c':
-                recordType = 'courseSession';
-                break;
-        }
-        return `${recordType}=${encodeURI(this.recordName)}`;
+        return `${this.recordFilterName}=${encodeURI(this.recordName)}`;
     }
 
     get hasFilters() {
