@@ -6,9 +6,9 @@
     </classAccesses>
     <customPermissions>
         <enabled>true</enabled>
-        <name>Can_Get_Public_URL</name>
+        <name>Can_Get_Public_Registration_URL</name>
     </customPermissions>
     <description>Access to the Get Public URL component for Traction Rec record pages</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Traction Rec Get Public URL</label>
+    <label>Traction Rec Get Public Registration URL</label>
 </PermissionSet>

@@ -2,5 +2,5 @@
 <CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Allows a user to access the Get Public URL component on Traction Rec object record pages</description>
     <isLicensed>false</isLicensed>
-    <label>Can Get Public URL</label>
+    <label>Can Get Public Registration URL</label>
 </CustomPermission>
