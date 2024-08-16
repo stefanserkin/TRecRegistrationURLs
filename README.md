@@ -9,8 +9,8 @@ Traction Rec offers a number of parameters to load filtered results in the Commu
 
 ## Post-Installation Steps
 
-1. **Add Get Public URL component** to Program, Course, and/or Course Session record pages.
-2. **Add Traction Rec Get Public URL permission set** to users that should be able to access the component.
+1. **Add `Get Public URL component`** to Program, Course, and/or Course Session record pages.
+2. **Add `Traction Rec Get Public Registration URL` permission set** to users that should be able to access the component.
     - Alternatively, add the following access to an existing permission set:
         - **Apex Class**: `TRecRegistrationUrlBuilderCtrl`
-        - **Custom Permission**: `Can Get Public URL`
+        - **Custom Permission**: `Can Get Public Registration URL`
