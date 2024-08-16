@@ -7,6 +7,8 @@ import getBaseUrl from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getBaseU
 import getAvailableSessions from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getAvailableSessions';
 import getAvailableLocations from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getAvailableLocations';
 import getCourseOptions from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getCourseOptions';
+import getAvailableInstructors from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getAvailableInstructors';
+import getAvailableGrades from '@salesforce/apex/TRecRegistrationUrlBuilderCtrl.getAvailableGrades';
 import userCanGetPublicUrl from '@salesforce/customPermission/Can_Get_Public_Registration_URL';
 
 const DAYS_OF_WEEK = [
@@ -40,11 +42,15 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     wiredLocations = [];
     wiredSessions = [];
     wiredCourseOptions = [];
+    wiredInstructors = [];
+    wiredGrades = [];
     
     baseUrl;
     @track locationOptions;
     @track sessionOptions;
     @track courseOptionOptions;
+    @track instructorOptions;
+    @track gradeOptions;
     daysOfWeek = DAYS_OF_WEEK;
 
     /*************************
@@ -58,10 +64,14 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
             'session': undefined,
             'startDate': undefined,
             'endDate': undefined,
+            'startTime': null,
+            'endTime': null,
             'dayOfWeek': [],
             'age': undefined,
             'courseOptionId': undefined,
-            'showUnavailableCourseOptions': false
+            'showUnavailableCourseOptions': false,
+            'instructor': undefined,
+            'grade': undefined
         };
     }
 
@@ -207,6 +217,38 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         }
     }
 
+    @wire(getAvailableInstructors, {recordId: '$recordId'})
+    wiredInstructorResult(result) {
+        this.isLoading = true;
+        this.wiredInstructors = result;
+        if (result.data) {
+            this.instructorOptions = result.data.map(name => ({
+                label: name,
+                value: name
+            }));
+            this.isLoading = false;
+        } else if (result.error) {
+            this.instructorOptions = undefined;
+            this.error = result.error;
+            this.handleError(this.error);
+            this.isLoading = false;
+        }
+    }
+
+    @wire(getAvailableGrades)
+    wiredGradeResult(result) {
+        this.isLoading = true;
+        this.wiredGrades = result;
+        if (result.data) {
+            this.gradeOptions = result.data;
+            this.isLoading = false;
+        } else if (result.error) {
+            this.gradeOptions = undefined;
+            this.error = result.error;
+            this.isLoading = false;
+        }
+    }
+
     get sessionIsDisabled() {
         return !this.sessionOptions || this.sessionOptions.length === 0;
     }
@@ -217,6 +259,10 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
 
     get courseOptionIdIsDisabled() {
         return !this.courseOptionOptions || this.courseOptionOptions.length === 0;
+    }
+
+    get instructorIsDisabled() {
+        return !this.instructorOptions || this.instructorOptions.length === 0;
     }
 
     /*************************
@@ -249,8 +295,12 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         return this.filters.session ||
             this.filters.startDate ||
             this.filters.endDate ||
+            this.filters.startTime ||
+            this.filters.endTime ||
             this.filters.dayOfWeek.length > 0 ||
-            this.filters.age;
+            this.filters.age ||
+            this.filters.instructor ||
+            this.filters.grade;
     }
 
     get filterString() {
@@ -263,11 +313,21 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
             const dateRange = [filters.startDate, filters.endDate];
             urlFilters.dateRange = dateRange;
         }
+        if (filters.startTime || filters.endTime) {
+            const timeRange = [filters.startTime, filters.endTime];
+            urlFilters.timeRange = timeRange;
+        }
         if (filters.dayOfWeek.length > 0) {
             urlFilters.dayOfWeek = filters.dayOfWeek;
         }
         if (filters.age) {
-            urlFilters.age = this.filters.age;
+            urlFilters.age = filters.age;
+        }
+        if (filters.instructor) {
+            urlFilters.instructor = encodeURI(filters.instructor);
+        }
+        if (filters.grade) {
+            urlFilters.grade = encodeURI(filters.grade);
         }
         return JSON.stringify(urlFilters);
     }
@@ -282,6 +342,7 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         } else {
             this.filters[changedFilter] = event.detail.value;
         }
+        console.log(this.filters.changedFilter);
     }
 
     /*************************
@@ -331,6 +392,8 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         refreshApex(this.wiredUrl);
         refreshApex(this.wiredLocations);
         refreshApex(this.wiredSessions);
+        refreshApex(this.wiredInstructors);
+        refreshApex(this.wiredGrades);
     }
 
     /*************************

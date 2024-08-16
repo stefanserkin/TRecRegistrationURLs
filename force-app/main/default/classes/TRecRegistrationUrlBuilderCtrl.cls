@@ -43,7 +43,38 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<TREX1__Course_Option__c> getCourseOptions(String courseSessionId, Boolean showUnavailable) {
+    public static List<String> getAvailableInstructors(Id recordId) {
+        try {
+            Set<String> instructors = new Set<String>();
+            List<TREX1__Course_Option__c> courseOptions = queryForCourseOptionsWithInstructors(recordId);
+            for (TREX1__Course_Option__c co : courseOptions) {
+                instructors.add(co.TREX1__Instructor__c);
+            }
+            return new List<String>(instructors);
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<PicklistOption> getAvailableGrades() {
+        List<PicklistOption> availableGrades = new List<PicklistOption>();
+        
+        Schema.SObjectType sobjectType = TREX1__Course_Option__c.SObjectType;
+        Schema.DescribeFieldResult fieldResult = sobjectType.getDescribe().fields.getMap().get('TREX1__Grade_Range__c').getDescribe();
+        List<Schema.PicklistEntry> picklistEntries = fieldResult.getPicklistValues();
+        
+        for (Schema.PicklistEntry entry : picklistEntries) {
+            PicklistOption option = new PicklistOption();
+            option.label = entry.getLabel();
+            option.value = entry.getValue();
+            availableGrades.add(option);
+        }
+        return availableGrades;
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<TREX1__Course_Option__c> getCourseOptions(Id courseSessionId, Boolean showUnavailable) {
         try {
             String query = 'SELECT Id, Name FROM TREX1__Course_Option__c' + 
                 ' WHERE Id IN (SELECT TREX1__Course_Option__c FROM TREX1__Course_Session_Option__c WHERE TREX1__Course_Session__c = :courseSessionId';
@@ -56,6 +87,33 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage());
         }
+    }
+
+    private static List<TREX1__Course_Option__c> queryForCourseOptionsWithInstructors(Id recordId) {
+        Set<String> instructors = new Set<String>();
+
+        String csoToRecordPath;
+        String objectApiName = recordId.getSObjectType().getDescribe().getName();
+        if (objectApiName == 'TREX1__Program__c') {
+            csoToRecordPath = 'TREX1__Course_Session__r.TREX1__Course__r.TREX1__Program__c';
+        } else if (objectApiName == 'TREX1__Course__c') {
+            csoToRecordPath = 'TREX1__Course_Session__r.TREX1__Course__c';
+        } else {
+            return new List<TREX1__Course_Option__c>();
+        }
+
+        String query = 'SELECT TREX1__Instructor__c FROM TREX1__Course_Option__c WHERE TREX1__Instructor__c != null' + 
+            ' AND Id IN (SELECT TREX1__Course_Option__c FROM TREX1__Course_Session_Option__c' + 
+            ' WHERE ' + String.escapeSingleQuotes(csoToRecordPath) + ' = :recordId)' + 
+            ' WITH USER_MODE ORDER BY Name ASC LIMIT 10000';
+        return Database.query(query);
+    }
+
+    public class PicklistOption {
+        @AuraEnabled
+        public String label;
+        @AuraEnabled
+        public String value;
     }
 
 }

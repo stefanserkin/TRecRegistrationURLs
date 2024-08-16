@@ -86,6 +86,7 @@
                             onchange={handleFilterChange}
                             disabled={locationIsDisabled}
                         ></lightning-combobox>
+
                         <lightning-combobox
                             name="session"
                             label="Session"
@@ -95,6 +96,7 @@
                             onchange={handleFilterChange}
                             disabled={sessionIsDisabled}
                         ></lightning-combobox>
+
                         <lightning-input 
                             type="date" 
                             name="startDate" 
@@ -109,6 +111,21 @@
                             value={filters.endDate}
                             onchange={handleFilterChange}
                         ></lightning-input>
+
+                        <lightning-input
+                            type="time"
+                            label="Start Time"
+                            name="startTime"
+                            value={filters.startTime}
+                            onchange={handleFilterChange}
+                        ></lightning-input>
+                        <lightning-input
+                            type="time"
+                            label="End Time"
+                            name="endTime"
+                            value={filters.endTime}
+                            onchange={handleFilterChange}
+                        ></lightning-input>
                     </lightning-layout-item>
     
                     <lightning-layout-item flexibility="auto" padding="around-small">
@@ -119,6 +136,23 @@
                             onchange={handleFilterChange} 
                             label="Age"
                         ></lightning-input>
+                        <lightning-combobox
+                            name="grade"
+                            label="Grade"
+                            value={filters.grade}
+                            placeholder="All Grades"
+                            options={gradeOptions}
+                            onchange={handleFilterChange}
+                        ></lightning-combobox>
+                        <lightning-combobox
+                            name="instructor"
+                            label="Instructor"
+                            value={filters.instructor}
+                            placeholder="All Instructors"
+                            options={instructorOptions}
+                            onchange={handleFilterChange}
+                            disabled={instructorIsDisabled}
+                        ></lightning-combobox>
                         <lightning-checkbox-group 
                             name="dayOfWeek"
                             label="Days of Week"

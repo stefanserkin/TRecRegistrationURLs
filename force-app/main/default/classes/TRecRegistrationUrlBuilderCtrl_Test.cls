@@ -116,6 +116,58 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
     }
 
     @IsTest
+    static void testGetInstructorsForCourse() {
+        TREX1__Course__c course = [SELECT Id FROM TREX1__Course__c LIMIT 1];
+        Test.startTest();
+        List<String> returnedInstructors = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(course.Id);
+        Test.stopTest();
+        Assert.isFalse(returnedInstructors.isEmpty(), 'Should have received instructors for related course options');
+    }
+
+    @IsTest
+    static void testGetInstructorsForProgram() {
+        TREX1__Program__c program = [SELECT Id FROM TREX1__Program__c LIMIT 1];
+        Test.startTest();
+        List<String> returnedInstructors = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(program.Id);
+        Test.stopTest();
+        Assert.isFalse(returnedInstructors.isEmpty(), 'Should have received instructors for related course options');
+    }
+
+    @IsTest
+    static void testGetInstructorsForUnrecognizedObject() {
+        TREX1__Location__c location = [SELECT Id FROM TREX1__Location__c LIMIT 1];
+        Test.startTest();
+        List<String> returnedInstructors = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(location.Id);
+        Test.stopTest();
+        Assert.isTrue(returnedInstructors.isEmpty(), 'Should have received an empty list for the unsupported object');
+    }
+
+    @IsTest
+    static void testGetInstructorsWithException() {
+        Id courseId = [SELECT Id FROM TREX1__Course__c LIMIT 1].Id;
+        User u = createMinimumAccessUser();
+        Test.startTest();
+        System.runAs(u) {
+            try {
+                List<String> returnedInstructors = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(courseId);
+                Assert.fail('Should have received an exception for insufficient permissions');
+            } catch (Exception e) {
+                Assert.areEqual('System.AuraHandledException', e.getTypeName(), 'Should have received an aura handled exception');
+            }
+        }
+        Test.stopTest();
+    }
+
+    @IsTest
+    static void testGetGrades() {
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options;
+        Test.startTest();
+        options = TRecRegistrationUrlBuilderCtrl.getAvailableGrades();
+        Test.stopTest();
+        Assert.isFalse(options.isEmpty(), 'Should have received a list of picklist options');
+    }
+
+    @IsTest
     static void testGetAvailableCourseOptions() {
         TREX1__Course_Session__c courseSession = [SELECT Id FROM TREX1__Course_Session__c LIMIT 1];
         List<TREX1__Course_Option__c> courseOptions = [
@@ -247,7 +299,8 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
                     TREX1__Register_Online_From_Date__c = startDate, 
                     TREX1__Register_Online_From_Time__c = '8:30 AM', 
                     TREX1__Register_Online_To_Date__c = endDate, 
-                    TREX1__Register_Online_To_Time__c = '10:30 PM'
+                    TREX1__Register_Online_To_Time__c = '10:30 PM',
+                    TREX1__Instructor__c = 'Test Instructor'
                 )
             );
             isAvailable = true;
