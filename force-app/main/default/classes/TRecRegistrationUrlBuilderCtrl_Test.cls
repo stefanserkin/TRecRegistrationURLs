@@ -37,24 +37,25 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
     @IsTest
     static void testGetSessions() {
         TREX1__Session__c availableSession = [
-            SELECT Id, TREX1__Status__c 
+            SELECT Id, Name, TREX1__Status__c 
               FROM TREX1__Session__c 
              WHERE TREX1__Status__c = :SESSION_STATUS_AVAILABLE 
              LIMIT 1
         ];
 
         Test.startTest();
-        List<TREX1__Session__c> returnedSessions = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
         Test.stopTest();
 
-        Assert.isTrue(returnedSessions.size() == 1, 'Should have received only the active session');
-        Assert.areEqual(availableSession.Id, returnedSessions[0].Id, 'Should have received the active session id');
+        Assert.isTrue(options.size() == 1, 'Should have received only the active session');
+        Assert.areEqual(availableSession.Id, options[0].value, 'Should have received the active session id for a value');
+        Assert.areEqual(availableSession.Name, options[0].label, 'Should have received the active session name for a label');
     }
 
     @IsTest
     static void testNoAvailableSessions() {
         TREX1__Session__c availableSession = [
-            SELECT Id, TREX1__Status__c 
+            SELECT Id
               FROM TREX1__Session__c 
              WHERE TREX1__Status__c = :SESSION_STATUS_AVAILABLE 
              LIMIT 1
@@ -63,10 +64,10 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         update availableSession;
 
         Test.startTest();
-        List<TREX1__Session__c> returnedSessions = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
         Test.stopTest();
 
-        Assert.isTrue(returnedSessions.isEmpty(), 'Should have received an empty list');
+        Assert.isTrue(options.isEmpty(), 'Should have received an empty list');
     }
 
     @IsTest
@@ -75,7 +76,7 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         Test.startTest();
         System.runAs(u) {
             try {
-                List<TREX1__Session__c> returnedSessions = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
+                List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableSessions();
                 Assert.fail('Should have received an exception for insufficient permissions');
             } catch (Exception e) {
                 Assert.areEqual('System.AuraHandledException', e.getTypeName(), 'Should have received an aura handled exception');
@@ -93,11 +94,12 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         ];
 
         Test.startTest();
-        List<TREX1__Location__c> returnedLocations = TRecRegistrationUrlBuilderCtrl.getAvailableLocations();
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableLocations();
         Test.stopTest();
 
-        Assert.isTrue(returnedLocations.size() == 1, 'Should have received only one location');
-        Assert.areEqual(availableLocations[0].Id, returnedLocations[0].Id, 'Should have received the correct location id');
+        Assert.isTrue(options.size() == 1, 'Should have received only one location');
+        Assert.areEqual(availableLocations[0].Name, options[0].value, 'Should have received the correct location name for a value');
+        Assert.areEqual(availableLocations[0].Name, options[0].label, 'Should have received the correct location name for a label');
     }
 
     @IsTest
@@ -106,7 +108,7 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         Test.startTest();
         System.runAs(u) {
             try {
-                List<TREX1__Location__c> returnedLocations = TRecRegistrationUrlBuilderCtrl.getAvailableLocations();
+                List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableLocations();
                 Assert.fail('Should have received an exception for insufficient permissions');
             } catch (Exception e) {
                 Assert.areEqual('System.AuraHandledException', e.getTypeName(), 'Should have received an aura handled exception');
@@ -119,27 +121,27 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
     static void testGetInstructorsForCourse() {
         TREX1__Course__c course = [SELECT Id FROM TREX1__Course__c LIMIT 1];
         Test.startTest();
-        List<String> returnedInstructors = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(course.Id);
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(course.Id);
         Test.stopTest();
-        Assert.isFalse(returnedInstructors.isEmpty(), 'Should have received instructors for related course options');
+        Assert.isFalse(options.isEmpty(), 'Should have received instructors for related course options');
     }
 
     @IsTest
     static void testGetInstructorsForProgram() {
         TREX1__Program__c program = [SELECT Id FROM TREX1__Program__c LIMIT 1];
         Test.startTest();
-        List<String> returnedInstructors = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(program.Id);
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(program.Id);
         Test.stopTest();
-        Assert.isFalse(returnedInstructors.isEmpty(), 'Should have received instructors for related course options');
+        Assert.isFalse(options.isEmpty(), 'Should have received instructors for related course options');
     }
 
     @IsTest
     static void testGetInstructorsForUnrecognizedObject() {
         TREX1__Location__c location = [SELECT Id FROM TREX1__Location__c LIMIT 1];
         Test.startTest();
-        List<String> returnedInstructors = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(location.Id);
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(location.Id);
         Test.stopTest();
-        Assert.isTrue(returnedInstructors.isEmpty(), 'Should have received an empty list for the unsupported object');
+        Assert.isTrue(options.isEmpty(), 'Should have received an empty list for the unsupported object');
     }
 
     @IsTest
@@ -149,7 +151,7 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         Test.startTest();
         System.runAs(u) {
             try {
-                List<String> returnedInstructors = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(courseId);
+                List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableInstructors(courseId);
                 Assert.fail('Should have received an exception for insufficient permissions');
             } catch (Exception e) {
                 Assert.areEqual('System.AuraHandledException', e.getTypeName(), 'Should have received an aura handled exception');
@@ -160,11 +162,24 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
 
     @IsTest
     static void testGetGrades() {
-        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options;
         Test.startTest();
-        options = TRecRegistrationUrlBuilderCtrl.getAvailableGrades();
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getAvailableGrades();
         Test.stopTest();
+
         Assert.isFalse(options.isEmpty(), 'Should have received a list of picklist options');
+
+        Set<String> gradeValues = new Set<String>();
+        for (TRecRegistrationUrlBuilderCtrl.PicklistOption po : options) {
+            gradeValues.add(po.value);
+        }
+
+        Schema.SObjectType sobjectType = TREX1__Course_Option__c.SObjectType;
+        Schema.DescribeFieldResult fieldResult = sobjectType.getDescribe().fields.getMap().get('TREX1__Grade_Range__c').getDescribe();
+        List<Schema.PicklistEntry> picklistEntries = fieldResult.getPicklistValues();
+        
+        for (Schema.PicklistEntry entry : picklistEntries) {
+            Assert.isTrue(gradeValues.contains(entry.getValue()), 'Should have received the valid grade value ' + entry.getValue());
+        }
     }
 
     @IsTest
@@ -181,13 +196,13 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         ];
 
         Test.startTest();
-        List<TREX1__Course_Option__c> returnedOptions = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
             courseSession.Id, 
             false
         );
         Test.stopTest();
 
-        Assert.areEqual(courseOptions.size(), returnedOptions.size(), 'Should have received only available course options');
+        Assert.areEqual(courseOptions.size(), options.size(), 'Should have received only available course options');
     }
 
     @IsTest
@@ -202,13 +217,13 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         ];
 
         Test.startTest();
-        List<TREX1__Course_Option__c> returnedOptions = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
+        List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
             courseSession.Id, 
             true
         );
         Test.stopTest();
 
-        Assert.areEqual(courseOptions.size(), returnedOptions.size(), 'Should have received all course options for the course session');
+        Assert.areEqual(courseOptions.size(), options.size(), 'Should have received all course options for the course session');
     }
 
     @IsTest
@@ -219,7 +234,7 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         Test.startTest();
         System.runAs(u) {
             try {
-                List<TREX1__Course_Option__c> returnedOptions = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
+                List<TRecRegistrationUrlBuilderCtrl.PicklistOption> options = TRecRegistrationUrlBuilderCtrl.getCourseOptions(
                     courseSession.Id, 
                     true
                 );

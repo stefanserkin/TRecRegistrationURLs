@@ -158,13 +158,7 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         this.isLoading = true;
         this.wiredLocations = result;
         if (result.data) {
-            this.locationOptions = [];
-            result.data.forEach(row => {
-                this.locationOptions.push({
-                     label: row.Name,
-                     value: row.Name
-                });
-            });
+            this.locationOptions = result.data;
             this.isLoading = false;
         } else if (result.error) {
             this.locationOptions = undefined;
@@ -179,13 +173,7 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         this.isLoading = true;
         this.wiredSessions = result;
         if (result.data) {
-            this.sessionOptions = [];
-            result.data.forEach(row => {
-                this.sessionOptions.push({
-                    label: row.Name,
-                    value: row.Id
-               });
-            });
+            this.sessionOptions = result.data;
             this.isLoading = false;
         } else if (result.error) {
             this.sessionOptions = undefined;
@@ -201,10 +189,7 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         this.wiredCourseOptions = result;
         if (this.isCourseSession) {
             if (result.data) {
-                this.courseOptionOptions = result.data.map(row => ({
-                    label: row.Name,
-                    value: row.Id
-                }));
+                this.courseOptionOptions = result.data;
                 this.isLoading = false;
             } else if (result.error) {
                 this.courseOptionOptions = undefined;
@@ -222,10 +207,7 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         this.isLoading = true;
         this.wiredInstructors = result;
         if (result.data) {
-            this.instructorOptions = result.data.map(name => ({
-                label: name,
-                value: name
-            }));
+            this.instructorOptions = result.data;
             this.isLoading = false;
         } else if (result.error) {
             this.instructorOptions = undefined;
@@ -250,19 +232,19 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     }
 
     get sessionIsDisabled() {
-        return !this.sessionOptions || this.sessionOptions.length === 0;
+        return this.isLoading || !this.sessionOptions || this.sessionOptions.length === 0;
     }
 
     get locationIsDisabled() {
-        return !this.locationOptions || this.locationOptions.length === 0;
+        return this.isLoading || !this.locationOptions || this.locationOptions.length === 0;
     }
 
     get courseOptionIdIsDisabled() {
-        return !this.courseOptionOptions || this.courseOptionOptions.length === 0;
+        return this.isLoading || !this.courseOptionOptions || this.courseOptionOptions.length === 0;
     }
 
     get instructorIsDisabled() {
-        return !this.instructorOptions || this.instructorOptions.length === 0;
+        return this.isLoading || !this.instructorOptions || this.instructorOptions.length === 0;
     }
 
     /*************************
