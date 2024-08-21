@@ -1,9 +1,13 @@
+/*****************************************************
+ * @date 2024
+ *****************************************************/
 @IsTest
 private class TRecRegistrationUrlBuilderCtrl_Test {
 
     private static final String SESSION_STATUS_AVAILABLE = 'Available';
     private static final String SESSION_STATUS_DRAFT = 'Draft';
     private static final String COURSE_OPTION_TYPE_STANDARD = 'Standard Course Option';
+    private static final String DEFAULT_BASE_URL = 'https://my-test-community.com';
 
     private static Date startDate = Date.today();
     private static Date endDate = Date.today().addDays(30);
@@ -19,9 +23,33 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
         String baseUrl = TRecRegistrationUrlBuilderCtrl.getBaseUrl();
         Test.stopTest();
 
-        TREX1__App_Config__c appConfig = TREX1__App_Config__c.getOrgDefaults();
-        String expectedUrl = appConfig.TREX1__Self_Reg_Redirect__c + '/s';
+        String expectedUrl = DEFAULT_BASE_URL + '/s';
+        Assert.areEqual(expectedUrl, baseUrl, 'Did not receive the expected url');
+    }
 
+    @IsTest
+    static void testGetBaseUrlWithTrailingSlash() {
+        String url = 'https://my-test-community.com/';
+        updateAppConfigUrl(url);
+
+        Test.startTest();
+        String baseUrl = TRecRegistrationUrlBuilderCtrl.getBaseUrl();
+        Test.stopTest();
+
+        String expectedUrl = DEFAULT_BASE_URL + '/s';
+        Assert.areEqual(expectedUrl, baseUrl, 'Did not receive the expected url');
+    }
+
+    @IsTest
+    static void testGetBaseUrlWithPath() {
+        String url = 'https://my-test-community.com/s/post-self-registration';
+        updateAppConfigUrl(url);
+
+        Test.startTest();
+        String baseUrl = TRecRegistrationUrlBuilderCtrl.getBaseUrl();
+        Test.stopTest();
+
+        String expectedUrl = DEFAULT_BASE_URL + '/s';
         Assert.areEqual(expectedUrl, baseUrl, 'Did not receive the expected url');
     }
 
@@ -256,8 +284,12 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
     }
 
     private static void loadAppConfig() {
+        updateAppConfigUrl(DEFAULT_BASE_URL);
+    }
+
+    private static void updateAppConfigUrl(String url) {
         TREX1__App_Config__c appConfig = TREX1__App_Config__c.getOrgDefaults();
-        appConfig.TREX1__Self_Reg_Redirect__c = 'https://my-test-community.com';
+        appConfig.TREX1__Self_Reg_Redirect__c = url;
         upsert appConfig;
     }
 

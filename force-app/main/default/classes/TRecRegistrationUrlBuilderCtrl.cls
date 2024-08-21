@@ -1,3 +1,6 @@
+/*****************************************************
+ * @date 2024
+ *****************************************************/
 public with sharing class TRecRegistrationUrlBuilderCtrl {
     
     private static final String SESSION_STATUS_AVAILABLE = 'Available';
@@ -5,9 +8,17 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
     @AuraEnabled(cacheable=true)
     public static String getBaseUrl() {
         TREX1__App_Config__c appConfig = TREX1__App_Config__c.getOrgDefaults();
-        String communityUrl = appConfig.TREX1__Self_Reg_Redirect__c;
-        String baseUrl = communityUrl != null ? communityUrl + '/s' : '/s';
-        return baseUrl;
+        String selfRegRedirect = appConfig.TREX1__Self_Reg_Redirect__c;
+        return parseToBaseUrl(selfRegRedirect);
+    }
+
+    private static String parseToBaseUrl(String url) {
+        String communityUrl = url ?? '';
+        Integer thirdSlashIndex = communityUrl.indexOf('/', communityUrl.indexOf('/', communityUrl.indexOf('/') + 1) + 1);
+        if (thirdSlashIndex != -1) {
+            communityUrl = communityUrl.substring(0, thirdSlashIndex);
+        }
+        return communityUrl + '/s';
     }
 
     @AuraEnabled(cacheable=true)
@@ -21,10 +32,7 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
                                                ORDER BY TREX1__Start_Date__c DESC
                                                LIMIT 10000])
             {
-                PicklistOption po = new PicklistOption();
-                po.label = session.Name;
-                po.value = session.Id;
-                options.add(po);
+                options.add( new PicklistOption(session, 'Name', 'Id') );
             }
             return options;
         } catch (Exception e) {
@@ -43,10 +51,7 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
                                                ORDER BY Name ASC
                                                LIMIT 10000])
             {
-                PicklistOption po = new PicklistOption();
-                po.label = location.Name;
-                po.value = location.Name;
-                options.add(po);
+                options.add( new PicklistOption(location, 'Name', 'Name') );
             }
             return options;
         } catch (Exception e) {
@@ -122,10 +127,7 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
         try {
             List<PicklistOption> options = new List<PicklistOption>();
             for (TREX1__Course_Option__c co : queryForCourseOptionsByCourseSessionId(courseSessionId, showUnavailable)) {
-                PicklistOption option = new PicklistOption();
-                option.label = co.Name;
-                option.value = co.Id;
-                options.add(option);
+                options.add( new PicklistOption(co, 'Name', 'Id') );
             }
             return options;
         } catch (Exception e) {
@@ -153,6 +155,13 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
         public String label;
         @AuraEnabled
         public String value;
+
+        public PicklistOption() {}
+
+        public PicklistOption(SObject obj, String labelField, String valueField) {
+            this.label = (String) obj.get(labelField);
+            this.value = (String) obj.get(valueField);
+        }
     }
 
 }
