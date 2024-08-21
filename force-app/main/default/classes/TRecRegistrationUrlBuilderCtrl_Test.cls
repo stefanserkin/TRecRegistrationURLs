@@ -221,8 +221,8 @@ private class TRecRegistrationUrlBuilderCtrl_Test {
              WHERE Id IN (SELECT TREX1__Course_Option__c 
                             FROM TREX1__Course_Session_Option__c
                            WHERE TREX1__Course_Session__c = :courseSession.Id
-                             AND (TREX1__Course_Option__r.TREX1__Visible_External_Users__c = true
-                              OR TREX1__Course_Online_Availability__c = ''))
+                             AND TREX1__Course_Online_Availability__c = '')
+                             // OR (TREX1__Course_Option__r.TREX1__Visible_External_Users__c = true
         ];
 
         Test.startTest();

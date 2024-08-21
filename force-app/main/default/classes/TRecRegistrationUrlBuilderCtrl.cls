@@ -142,11 +142,11 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
     ) {
         String query = 'SELECT Id, Name FROM TREX1__Course_Option__c' + 
                        ' WHERE Id IN (SELECT TREX1__Course_Option__c FROM TREX1__Course_Session_Option__c' +
-                       ' WHERE TREX1__Course_Session__c = :courseSessionId';
+                                     ' WHERE TREX1__Course_Session__c = :courseSessionId';
         if (!showUnavailable) {
-            query += ' AND (TREX1__Course_Online_Availability__c = \'\' OR TREX1__Course_Option__r.TREX1__Visible_External_Users__c = true)';
+            query += ' AND TREX1__Course_Online_Availability__c = \'\'';  // OR TREX1__Course_Option__r.TREX1__Visible_External_Users__c = true)';
         }
-        query += ') WITH USER_MODE ORDER BY Name ASC LIMIT 10000';
+        query += ' WITH USER_MODE ORDER BY Name ASC LIMIT 10000';
         System.debug(query);
         return Database.query(query);
     }

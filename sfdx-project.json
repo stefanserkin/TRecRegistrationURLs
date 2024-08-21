@@ -9,13 +9,19 @@
       "definitionFile": "config/project-scratch-def.json",
       "dependencies": [
         {
+          "package": "04t1U0000058cL3QAI"
+        },
+        {
+          "package": "04t4Q000001Rzp5QAC"
+        },
+        {
           "package": "04t5G000003RUjoQAG"
         }
       ]
     }
   ],
   "name": "TRec Registration URLs",
-  "namespace": "",
+  "namespace": "agrec",
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "61.0"
 }
