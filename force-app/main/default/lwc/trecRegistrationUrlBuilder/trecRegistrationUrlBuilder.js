@@ -330,7 +330,6 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
         } else {
             this.filters[changedFilter] = event.detail.value;
         }
-        console.log(this.filters.changedFilter);
     }
 
     /*************************
