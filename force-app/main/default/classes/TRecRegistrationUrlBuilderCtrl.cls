@@ -72,10 +72,6 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
             
             for (String instructor : instructors) {
                 options.add( new PicklistOption(instructor) );
-                PicklistOption po = new PicklistOption();
-                po.label = instructor;
-                po.value = instructor;
-                options.add(po);
             }
             return options;
         } catch (Exception e) {
@@ -154,11 +150,8 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
         @AuraEnabled
         public String value;
 
-        public PicklistOption() {}
-
         public PicklistOption(String value) {
-            this.label = value;
-            this.value = value;
+            this(value, value);
         }
 
         public PicklistOption(String label, String value) {
