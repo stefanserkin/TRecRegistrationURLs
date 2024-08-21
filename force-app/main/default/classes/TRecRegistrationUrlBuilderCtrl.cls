@@ -63,13 +63,8 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
     public static List<PicklistOption> getAvailableInstructors(Id recordId) {
         try {
             List<PicklistOption> options = new List<PicklistOption>();
-
-            Set<String> instructors = new Set<String>();
             List<TREX1__Course_Option__c> courseOptions = queryForCourseOptionsWithInstructors(recordId);
-            for (TREX1__Course_Option__c co : courseOptions) {
-                instructors.add(co.TREX1__Instructor__c);
-            }
-            
+            Set<String> instructors = getUniqueInstructorsFromCourseOptions(courseOptions);
             for (String instructor : instructors) {
                 options.add( new PicklistOption(instructor) );
             }
@@ -97,6 +92,16 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
                        ' WHERE ' + String.escapeSingleQuotes(csoToRecordPath) + ' = :recordId)' + 
                        ' WITH USER_MODE ORDER BY Name ASC LIMIT 10000';
         return Database.query(query);
+    }
+
+    private static Set<String> getUniqueInstructorsFromCourseOptions(
+        List<TREX1__Course_Option__c> courseOptions
+    ) {
+        Set<String> instructors = new Set<String>();
+        for (TREX1__Course_Option__c co : courseOptions) {
+            instructors.add(co.TREX1__Instructor__c);
+        }
+        return instructors;
     }
 
     @AuraEnabled(cacheable=true)
