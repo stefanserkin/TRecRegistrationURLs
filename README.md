@@ -14,3 +14,6 @@ Traction Rec offers a number of parameters to load filtered results in the Commu
     - Alternatively, add the following access to an existing permission set:
         - **Apex Class**: `TRecRegistrationUrlBuilderCtrl`
         - **Custom Permission**: `Can Get Public Registration URL`
+
+## License
+This package is licensed under the MIT License. See the [LICENSE](LICENSE.txt) file for more information.

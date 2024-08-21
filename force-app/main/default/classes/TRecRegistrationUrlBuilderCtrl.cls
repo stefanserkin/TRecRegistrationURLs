@@ -1,6 +1,8 @@
-/*****************************************************
- * @date 2024
- *****************************************************/
+/*
+ * MIT License
+ * Copyright (c) 2024 Asphalt Green, Inc.
+ * Full license text available in the LICENSE file distributed with this package.
+ */
 public with sharing class TRecRegistrationUrlBuilderCtrl {
     
     private static final String SESSION_STATUS_AVAILABLE = 'Available';
