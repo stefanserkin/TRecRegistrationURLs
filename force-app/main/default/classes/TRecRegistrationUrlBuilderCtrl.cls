@@ -32,7 +32,7 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
                                                ORDER BY TREX1__Start_Date__c DESC
                                                LIMIT 10000])
             {
-                options.add( new PicklistOption(session, 'Name', 'Id') );
+                options.add( new PicklistOption(session.Name, session.Id) );
             }
             return options;
         } catch (Exception e) {
@@ -45,13 +45,13 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
         try {
             List<PicklistOption> options = new List<PicklistOption>();
             for (TREX1__Location__c location : [SELECT Id, Name 
-                                                FROM TREX1__Location__c
-                                               WHERE TREX1__Available_for_Location_Filter_Community__c = true
-                                                WITH USER_MODE
-                                               ORDER BY Name ASC
-                                               LIMIT 10000])
+                                                  FROM TREX1__Location__c
+                                                 WHERE TREX1__Available_for_Location_Filter_Community__c = true
+                                                  WITH USER_MODE
+                                                 ORDER BY Name ASC
+                                                 LIMIT 10000])
             {
-                options.add( new PicklistOption(location, 'Name', 'Name') );
+                options.add( new PicklistOption(location.Name) );
             }
             return options;
         } catch (Exception e) {
@@ -71,6 +71,7 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
             }
             
             for (String instructor : instructors) {
+                options.add( new PicklistOption(instructor) );
                 PicklistOption po = new PicklistOption();
                 po.label = instructor;
                 po.value = instructor;
@@ -111,10 +112,7 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
         List<Schema.PicklistEntry> picklistEntries = fieldResult.getPicklistValues();
         
         for (Schema.PicklistEntry entry : picklistEntries) {
-            PicklistOption option = new PicklistOption();
-            option.label = entry.getLabel();
-            option.value = entry.getValue();
-            options.add(option);
+            options.add( new PicklistOption(entry.getLabel(), entry.getValue()) );
         }
         return options;
     }
@@ -127,7 +125,7 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
         try {
             List<PicklistOption> options = new List<PicklistOption>();
             for (TREX1__Course_Option__c co : queryForCourseOptionsByCourseSessionId(courseSessionId, showUnavailable)) {
-                options.add( new PicklistOption(co, 'Name', 'Id') );
+                options.add( new PicklistOption(co.Name, co.Id) );
             }
             return options;
         } catch (Exception e) {
@@ -158,9 +156,14 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
 
         public PicklistOption() {}
 
-        public PicklistOption(SObject obj, String labelField, String valueField) {
-            this.label = (String) obj.get(labelField);
-            this.value = (String) obj.get(valueField);
+        public PicklistOption(String value) {
+            this.label = value;
+            this.value = value;
+        }
+
+        public PicklistOption(String label, String value) {
+            this.label = label;
+            this.value = value;
         }
     }
 
