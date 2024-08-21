@@ -2,10 +2,19 @@
   "packageDirectories": [
     {
       "path": "force-app",
-      "default": true
+      "default": true,
+      "package": "TRec Registration URLs",
+      "versionName": "0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "definitionFile": "config/project-scratch-def.json",
+      "dependencies": [
+        {
+          "package": "04t5G000003RUjoQAG"
+        }
+      ]
     }
   ],
-  "name": "TRecRegistrationURLs",
+  "name": "TRec Registration URLs",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "61.0"
