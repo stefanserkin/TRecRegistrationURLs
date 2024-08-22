@@ -12,9 +12,6 @@
           "package": "04t1U0000058cL3QAI"
         },
         {
-          "package": "04t4Q000001Rzp5QAC"
-        },
-        {
           "package": "04t5G000003RUjoQAG"
         }
       ],
@@ -27,6 +24,7 @@
   "sourceApiVersion": "61.0",
   "packageAliases": {
     "TRec Registration URLs": "0HoUX00000000OD0AY",
-    "TRec Registration URLs@0.1.0-1": "04tUX000000NzM9YAK"
+    "TRec Registration URLs@0.1.0-1": "04tUX000000NzM9YAK",
+    "TRec Registration URLs@0.2.0-1": "04tUX000000O277YAC"
   }
 }
