@@ -1,10 +1,22 @@
 {
   "packageDirectories": [
     {
-      "versionName": "ver 0.1",
-      "versionNumber": "0.1.0.NEXT",
       "path": "force-app",
       "package": "TRec Registration URLs",
+      "versionName": "0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "definitionFile": "config/project-scratch-def.json",
+      "dependencies": [
+        {
+          "package": "04t1U0000058cL3QAI"
+        },
+        {
+          "package": "04t4Q000001Rzp5QAC"
+        },
+        {
+          "package": "04t5G000003RUjoQAG"
+        }
+      ],
       "versionDescription": ""
     }
   ],
