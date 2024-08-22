@@ -4,8 +4,8 @@
       "path": "force-app",
       "default": true,
       "package": "TRec Registration URLs",
-      "versionName": "0.1",
-      "versionNumber": "0.1.0.NEXT",
+      "versionName": "0.2",
+      "versionNumber": "0.2.0.NEXT",
       "definitionFile": "config/project-scratch-def.json",
       "dependencies": [
         {
