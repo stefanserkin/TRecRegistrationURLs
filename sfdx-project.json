@@ -2,6 +2,7 @@
   "packageDirectories": [
     {
       "path": "force-app",
+      "default": true,
       "package": "TRec Registration URLs",
       "versionName": "0.1",
       "versionNumber": "0.1.0.NEXT",
@@ -25,6 +26,7 @@
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "61.0",
   "packageAliases": {
-    "TRec Registration URLs": "0HoUX00000000OD0AY"
+    "TRec Registration URLs": "0HoUX00000000OD0AY",
+    "TRec Registration URLs@0.1.0-1": "04tUX000000NzM9YAK"
   }
 }
