@@ -1,8 +1,3 @@
-/*
- * MIT License
- * Copyright (c) 2024 Asphalt Green, Inc.
- * Full license text available in the LICENSE file distributed with this package.
- */
 @IsTest
 private class TRecRegistrationUrlBuilderCtrl_Test {
 
