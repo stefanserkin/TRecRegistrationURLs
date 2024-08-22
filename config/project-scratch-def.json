@@ -11,6 +11,9 @@
     },
     "enhancedNotesSettings": {
       "enableEnhancedNotes": true
+    },
+    "orgPreferenceSettings": {
+      "notesReservedPref01": true
     }
   }
 }
