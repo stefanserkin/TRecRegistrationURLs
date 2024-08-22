@@ -1,7 +1,7 @@
 {
   "orgName": "Asphalt Green",
   "edition": "Developer",
-  "features": ["EnableSetPasswordInApi"],
+  "features": ["EnableSetPasswordInApi", "Notes"],
   "settings": {
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
@@ -11,9 +11,6 @@
     },
     "enhancedNotesSettings": {
       "enableEnhancedNotes": true
-    },
-    "orgPreferenceSettings": {
-      "notesReservedPref01": true
     }
   }
 }
