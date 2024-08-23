@@ -158,21 +158,32 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     wiredBaseUrlResult(result) {
         this.wiredBaseUrl = result;
         if (result.data) {
-            let url = result.data;
-            if (this.registrationUrlPath) {
-                if (!this.registrationUrlPath.startsWith('/')) {
-                    this.registrationUrlPath = '/' + this.registrationUrlPath;
-                }
-                if (this.registrationUrlPath.startsWith('/s/')) {
-                    this.registrationUrlPath = this.registrationUrlPath.substring(2);
-                }
-                url += this.registrationUrlPath;
-            }
-            this.baseUrl = url;
+            const communityUrl = result.data;
+            this.baseUrl = this.constructBaseUrl(communityUrl);
         } else if (result.error) {
             this.error = result.error;
             this.handleError(this.error);
         }
+    }
+
+    constructBaseUrl(communityUrl) {
+        let result = communityUrl ? communityUrl : '';
+        const fullUrlPattern = /^(https?:\/\/|www\.)/;
+    
+        if (this.registrationUrlPath) {
+            if (fullUrlPattern.test(this.registrationUrlPath)) {
+                return this.registrationUrlPath;
+            }
+
+            if (!this.registrationUrlPath.startsWith('/')) {
+                this.registrationUrlPath = '/' + this.registrationUrlPath;
+            }
+            if (this.registrationUrlPath.startsWith('/s/')) {
+                this.registrationUrlPath = this.registrationUrlPath.substring(2);
+            }
+            result += this.registrationUrlPath;
+        }
+        return result;
     }
 
     @wire(getAvailableLocations)
