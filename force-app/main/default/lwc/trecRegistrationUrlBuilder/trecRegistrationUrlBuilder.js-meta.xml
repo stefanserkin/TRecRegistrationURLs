@@ -21,6 +21,10 @@
                 label="Registration URL Path"
                 description="The relative URL path to the registration page in the community. Example: /registration"
             />
+            <supportedFormFactors>
+                <supportedFormFactor type="Large"></supportedFormFactor>
+                <supportedFormFactor type="Small"></supportedFormFactor>
+            </supportedFormFactors>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

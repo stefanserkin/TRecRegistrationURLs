@@ -168,10 +168,10 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
 
     constructBaseUrl(communityUrl) {
         let result = communityUrl ? communityUrl : '';
-        const fullUrlPattern = /^(https?:\/\/|www\.)/;
     
         if (this.registrationUrlPath) {
-            if (fullUrlPattern.test(this.registrationUrlPath)) {
+            const regEx = new RegExp('^(?:[a-z+]+:)?//', 'i');
+            if (regEx.test(this.registrationUrlPath)) {
                 return this.registrationUrlPath;
             }
 
