@@ -403,9 +403,10 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
 
     handleRefreshComponent() {
         this.filters = this.emptyFilters;
-        refreshApex(this.wiredUrl);
+        refreshApex(this.wiredBaseUrl);
         refreshApex(this.wiredLocations);
         refreshApex(this.wiredSessions);
+        refreshApex(this.wiredCourseOptions);
         refreshApex(this.wiredInstructors);
         refreshApex(this.wiredGrades);
     }
