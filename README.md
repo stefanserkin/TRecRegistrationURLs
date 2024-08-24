@@ -1,6 +1,6 @@
 # Get Public Registration URLs in Traction Rec
 
-Traction Rec offers a number of parameters to load filtered results in the Community Registration component when a user lands on a community page. This component gives internal users a way to quickly generate filtered URLs from Program, Course, and Course Session record pages.
+Traction Rec offers a number of parameters to load filtered results in the Community Registration (Web Reg) app when a user lands on the page. This component gives internal users a way to quickly generate filtered URLs from Program, Course, and Course Session record pages.
 
 ## Docs
 
