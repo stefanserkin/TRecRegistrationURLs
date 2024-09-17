@@ -10,6 +10,7 @@
     <targetConfigs>
         <targetConfig targets="lightning__RecordPage">
             <objects>
+                <object>TREX1__Program_Category__c</object>
                 <object>TREX1__Program__c</object>
                 <object>TREX1__Course__c</object>
                 <object>TREX1__Course_Session__c</object>

@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 import { LightningElement, api, wire, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -98,9 +97,20 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
     }
 
     /*************************
+     * User Access
+     *************************/
+    get userHasComponentAccess() {
+        return userCanGetPublicUrl;
+    }
+
+    /*************************
      * Object-Dependent Properties
      *************************/
     objectMap = {
+        'TREX1__Program_Category__c': { 
+            fields: ['TREX1__Program_Category__c.Name'], 
+            filterName: 'category' 
+        },
         'TREX1__Program__c': { 
             fields: ['TREX1__Program__c.Name'], 
             filterName: 'program' 
@@ -125,13 +135,6 @@ export default class TrecRegistrationUrlBuilder extends NavigationMixin(Lightnin
 
     get isCourseSession() {
         return this.objectApiName && this.objectApiName === 'TREX1__Course_Session__c';
-    }
-
-    /*************************
-     * User Access
-     *************************/
-    get userHasComponentAccess() {
-        return userCanGetPublicUrl;
     }
 
     /*************************
