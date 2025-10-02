@@ -111,9 +111,9 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
         String csoToRecordPath;
         String objectApiName = recordId.getSObjectType().getDescribe().getName();
         if (objectApiName == 'TREX1__Program__c') {
-            csoToRecordPath = 'TREX1__Course_Session__r.TREX1__Course__r.TREX1__Program__c';
+            csoToRecordPath = 'TREX1__cso_Course_Session__r.TREX1__Course__r.TREX1__Program__c';
         } else if (objectApiName == 'TREX1__Course__c') {
-            csoToRecordPath = 'TREX1__Course_Session__r.TREX1__Course__c';
+            csoToRecordPath = 'TREX1__cso_Course_Session__r.TREX1__Course__c';
         }
         return csoToRecordPath;
     }
@@ -164,7 +164,7 @@ public with sharing class TRecRegistrationUrlBuilderCtrl {
     ) {
         String query = 'SELECT Id, Name FROM TREX1__Course_Option__c' + 
                        ' WHERE Id IN (SELECT TREX1__Course_Option__c FROM TREX1__Course_Session_Option__c' +
-                                     ' WHERE TREX1__Course_Session__c = :courseSessionId';
+                                     ' WHERE TREX1__cso_Course_Session__c = :courseSessionId';
         if (!showUnavailable) {
             query += ' AND TREX1__Course_Online_Availability__c = \'\'';  // OR TREX1__Course_Option__r.TREX1__Visible_External_Users__c = true)';
         }
