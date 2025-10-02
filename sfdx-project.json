@@ -21,7 +21,7 @@
   "name": "TRec Registration URLs",
   "namespace": "agrec",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "61.0",
+  "sourceApiVersion": "64.0",
   "packageAliases": {
     "TRec Registration URLs": "0HoUX00000000OD0AY",
     "TRec Registration URLs@0.1.0-1": "04tUX000000NzM9YAK",
